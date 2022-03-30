@@ -20,15 +20,20 @@ class _DrawingPageState extends State<DrawingPage> {
   DrawnLine line;
   Color selectedColor = Colors.black;
   double selectedWidth = 5.0;
+  bool hidden = false;
 
-  StreamController<List<DrawnLine>> linesStreamController = StreamController<List<DrawnLine>>.broadcast();
-  StreamController<DrawnLine> currentLineStreamController = StreamController<DrawnLine>.broadcast();
+  StreamController<List<DrawnLine>> linesStreamController =
+      StreamController<List<DrawnLine>>.broadcast();
+  StreamController<DrawnLine> currentLineStreamController =
+      StreamController<DrawnLine>.broadcast();
 
   Future<void> save() async {
     try {
-      RenderRepaintBoundary boundary = _globalKey.currentContext.findRenderObject() as RenderRepaintBoundary;
+      RenderRepaintBoundary boundary =
+          _globalKey.currentContext.findRenderObject() as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage();
-      ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      ByteData byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
       Uint8List pngBytes = byteData.buffer.asUint8List();
       var saved = await ImageGallerySaver.saveImage(
         pngBytes,
@@ -46,6 +51,12 @@ class _DrawingPageState extends State<DrawingPage> {
     setState(() {
       lines = [];
       line = null;
+    });
+  }
+
+  Future<void> hide() async {
+    setState(() {
+      hidden = !hidden;
     });
   }
 
@@ -136,17 +147,20 @@ class _DrawingPageState extends State<DrawingPage> {
   }
 
   Widget buildStrokeToolbar() {
+    final children = hidden
+        ? []
+        : [
+            buildStrokeButton(5.0),
+            buildStrokeButton(10.0),
+            buildStrokeButton(15.0),
+          ];
     return Positioned(
       bottom: 100.0,
       right: 10.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          buildStrokeButton(5.0),
-          buildStrokeButton(10.0),
-          buildStrokeButton(15.0),
-        ],
+        children: [...children],
       ),
     );
   }
@@ -163,13 +177,32 @@ class _DrawingPageState extends State<DrawingPage> {
         child: Container(
           width: strokeWidth * 2,
           height: strokeWidth * 2,
-          decoration: BoxDecoration(color: selectedColor, borderRadius: BorderRadius.circular(50.0)),
+          decoration: BoxDecoration(
+              color: selectedColor, borderRadius: BorderRadius.circular(50.0)),
         ),
       ),
     );
   }
 
   Widget buildColorToolbar() {
+    final children = hidden
+        ? []
+        : [
+            Divider(
+              height: 20.0,
+            ),
+            buildClearButton(),
+            Divider(
+              height: 20.0,
+            ),
+            buildColorButton(Colors.red),
+            buildColorButton(Colors.blueAccent),
+            buildColorButton(Colors.deepOrange),
+            buildColorButton(Colors.green),
+            buildColorButton(Colors.lightBlue),
+            buildColorButton(Colors.black),
+            buildColorButton(Colors.white),
+          ];
     return Positioned(
       top: 40.0,
       right: 10.0,
@@ -177,21 +210,8 @@ class _DrawingPageState extends State<DrawingPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          buildClearButton(),
-          Divider(
-            height: 10.0,
-          ),
-          buildSaveButton(),
-          Divider(
-            height: 20.0,
-          ),
-          buildColorButton(Colors.red),
-          buildColorButton(Colors.blueAccent),
-          buildColorButton(Colors.deepOrange),
-          buildColorButton(Colors.green),
-          buildColorButton(Colors.lightBlue),
-          buildColorButton(Colors.black),
-          buildColorButton(Colors.white),
+          buildHideButton(),
+          ...children,
         ],
       ),
     );
@@ -213,19 +233,6 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  Widget buildSaveButton() {
-    return GestureDetector(
-      onTap: save,
-      child: CircleAvatar(
-        child: Icon(
-          Icons.save,
-          size: 20.0,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
   Widget buildClearButton() {
     return GestureDetector(
       onTap: clear,
@@ -235,6 +242,27 @@ class _DrawingPageState extends State<DrawingPage> {
           size: 20.0,
           color: Colors.white,
         ),
+      ),
+    );
+  }
+
+  Widget buildHideButton() {
+    final child = hidden
+        ? Icon(
+            Icons.keyboard_arrow_down,
+            size: 30.0,
+            color: Colors.black,
+          )
+        : Icon(
+            Icons.keyboard_arrow_up,
+            size: 30.0,
+            color: Colors.black,
+          );
+    return GestureDetector(
+      onTap: hide,
+      child: CircleAvatar(
+        backgroundColor: Colors.transparent,
+        child: child,
       ),
     );
   }
