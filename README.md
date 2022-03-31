@@ -24,3 +24,9 @@ This was derived from a tutorial at: https://www.raywenderlich.com/25237210-buil
 
 
 - [ ] look into leverage for sketch app
+
+## References
+
+Icons created with https://appicon.co/  NOTE: original image should be square to avoid white edges on IOS Home screen.
+
+
