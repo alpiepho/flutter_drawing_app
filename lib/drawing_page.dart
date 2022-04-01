@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:drawing_app/drawn_line.dart';
 import 'package:drawing_app/sketcher.dart';
@@ -86,28 +85,6 @@ class _DrawingPageState extends State<DrawingPage> {
   @override
   Widget build(BuildContext context) {
     var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    if (!kIsWeb && !isPortrait) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Container(
-            width: 1000,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                new Text(
-                  "Landscape mode is not supported.",
-                  style: Theme.of(context).textTheme.headline3.copyWith(
-                        color: Colors.white,
-                      ),
-                )
-              ],
-            ),
-          ),
-        ),
-      );
-    }
 
     return Scaffold(
       backgroundColor: Colors.yellow[50],
@@ -115,10 +92,10 @@ class _DrawingPageState extends State<DrawingPage> {
         children: [
           buildAllPaths(context),
           buildCurrentPath(context),
-          buildHelpToolbar(),
-          buildStrokeToolbar(),
-          buildColorToolbar(),
-          buildHideToolbar(),
+          buildHelpToolbar(isPortrait),
+          buildStrokeToolbar(isPortrait),
+          buildColorToolbar(isPortrait),
+          buildHideToolbar(isPortrait),
         ],
       ),
     );
@@ -195,21 +172,33 @@ class _DrawingPageState extends State<DrawingPage> {
     linesStreamController.add(lines);
   }
 
-  Widget buildHelpToolbar() {
+  Widget buildHelpToolbar(bool isPortrait) {
     final children = hidden
         ? []
         : [
             buildHelpButton(),
           ];
-    return Positioned(
-      bottom: 50.0,
-      right: 10.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [...children],
-      ),
-    );
+    if (isPortrait) {
+      return Positioned(
+        bottom: 50.0,
+        right: 10.0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [...children],
+        ),
+      );
+    } else {
+      return Positioned(
+        top: 25.0,
+        right: 50.0,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [...children],
+        ),
+      );
+    }
   }
 
   Widget buildHelpButton() {
@@ -218,7 +207,7 @@ class _DrawingPageState extends State<DrawingPage> {
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
         child: Icon(
-          Icons.question_mark,
+          Icons.settings,
           size: 30.0,
           color: Colors.black,
         ),
@@ -226,7 +215,7 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  Widget buildStrokeToolbar() {
+  Widget buildStrokeToolbar(bool isPortrait) {
     final children = hidden
         ? []
         : [
@@ -234,15 +223,27 @@ class _DrawingPageState extends State<DrawingPage> {
             buildStrokeButton(10.0),
             buildStrokeButton(15.0),
           ];
-    return Positioned(
-      bottom: 150.0,
-      right: 10.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [...children],
-      ),
-    );
+    if (isPortrait) {
+      return Positioned(
+        bottom: 120.0,
+        right: 10.0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [...children],
+        ),
+      );
+    } else {
+      return Positioned(
+        top: 20.0,
+        right: 150.0,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [...children],
+        ),
+      );
+    }
   }
 
   Widget buildStrokeButton(double strokeWidth) {
@@ -253,7 +254,7 @@ class _DrawingPageState extends State<DrawingPage> {
         });
       },
       child: Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(10.0),
         child: Container(
           width: strokeWidth * 2,
           height: strokeWidth * 2,
@@ -264,7 +265,7 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  Widget buildColorToolbar() {
+  Widget buildColorToolbar(bool isPortrait) {
     final children = hidden
         ? []
         : [
@@ -280,17 +281,31 @@ class _DrawingPageState extends State<DrawingPage> {
             buildColorButton(Colors.black),
             buildColorButton(Colors.white),
           ];
-    return Positioned(
-      top: 90.0,
-      right: 10.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          ...children,
-        ],
-      ),
-    );
+    if (isPortrait) {
+      return Positioned(
+        top: 90.0,
+        right: 10.0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            ...children,
+          ],
+        ),
+      );
+    } else {
+      return Positioned(
+        top: 20.0,
+        left: 90.0,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            ...children,
+          ],
+        ),
+      );
+    }
   }
 
   Widget buildColorButton(Color color) {
@@ -322,18 +337,32 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  Widget buildHideToolbar() {
-    return Positioned(
-      top: 20.0,
-      right: 15.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          buildHideButton(),
-        ],
-      ),
-    );
+  Widget buildHideToolbar(bool isPortrait) {
+    if (isPortrait) {
+      return Positioned(
+        top: 20.0,
+        right: 15.0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            buildHideButton(),
+          ],
+        ),
+      );
+    } else {
+      return Positioned(
+        top: 20.0,
+        left: 15.0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            buildHideButton(),
+          ],
+        ),
+      );
+    }
   }
 
   Widget buildHideButton() {
