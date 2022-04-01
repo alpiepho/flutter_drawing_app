@@ -23,12 +23,12 @@ This was derived from a tutorial at: https://www.raywenderlich.com/25237210-buil
 - [ ] qr
 - [ ] more readme about using screen shot instead of save
 - [ ] try hive for saved state
-- [ ] toolboxes in landscape
-- [ ] small size is hard to touch
+- [x] toolboxes in landscape
+- [x] small size is hard to touch
 - [ ] color selector
 - [ ] more sizes
 - [ ] protected area is blue, what background
-- [ ] select background color
+- [ ] select background color?
 - [ ] gear and settings with help
 
 Question: when is it done?
