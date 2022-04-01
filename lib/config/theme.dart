@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 
 ThemeData theme() {
   return ThemeData(
+    // may force color for unsafe?
+    backgroundColor: Color(0xFFFFFDE7),
+    // forces color for unsafe top/bottom (left/right in ladscape)
+    // also, use manifest.json background_color BEFORE flutter is loaded
+    primaryColor: Color(0xFFFFFDE7),
     scaffoldBackgroundColor: Colors.white,
     fontFamily: "Avenir",
     textTheme: textTheme(),

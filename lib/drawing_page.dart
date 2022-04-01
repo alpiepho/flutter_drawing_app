@@ -44,6 +44,14 @@ class _DrawingPageState extends State<DrawingPage> {
                   children: [
                     Center(
                         child: Text(
+                      "Version: 0.1",
+                      style: Theme.of(context).textTheme.headline3,
+                    )),
+                    Divider(
+                      height: 20.0,
+                    ),
+                    Center(
+                        child: Text(
                       "For more details:",
                       style: Theme.of(context).textTheme.headline3,
                     )),
@@ -152,12 +160,18 @@ class _DrawingPageState extends State<DrawingPage> {
   }
 
   void onPanStart(DragStartDetails details) {
+    if (hidden) {
+      return;
+    }
     RenderBox box = context.findRenderObject();
     Offset point = box.globalToLocal(details.globalPosition);
     line = DrawnLine([point], selectedColor, selectedWidth);
   }
 
   void onPanUpdate(DragUpdateDetails details) {
+    if (hidden) {
+      return;
+    }
     RenderBox box = context.findRenderObject();
     Offset point = box.globalToLocal(details.globalPosition);
 
@@ -167,8 +181,10 @@ class _DrawingPageState extends State<DrawingPage> {
   }
 
   void onPanEnd(DragEndDetails details) {
+    if (hidden) {
+      return;
+    }
     lines = List.from(lines)..add(line);
-
     linesStreamController.add(lines);
   }
 
@@ -181,7 +197,7 @@ class _DrawingPageState extends State<DrawingPage> {
     if (isPortrait) {
       return Positioned(
         bottom: 50.0,
-        right: 10.0,
+        right: 15.0,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -253,8 +269,8 @@ class _DrawingPageState extends State<DrawingPage> {
           selectedWidth = strokeWidth;
         });
       },
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
         child: Container(
           width: strokeWidth * 2,
           height: strokeWidth * 2,
@@ -270,14 +286,15 @@ class _DrawingPageState extends State<DrawingPage> {
         ? []
         : [
             buildClearButton(),
-            Divider(
+            SizedBox(
               height: 20.0,
+              width: 20.0,
             ),
             buildColorButton(Colors.red),
             buildColorButton(Colors.blueAccent),
-            buildColorButton(Colors.deepOrange),
+            buildColorButton(Colors.yellow),
             buildColorButton(Colors.green),
-            buildColorButton(Colors.lightBlue),
+            //buildColorButton(Colors.lightBlue),
             buildColorButton(Colors.black),
             buildColorButton(Colors.white),
           ];
@@ -328,6 +345,7 @@ class _DrawingPageState extends State<DrawingPage> {
     return GestureDetector(
       onTap: clear,
       child: CircleAvatar(
+        backgroundColor: Colors.blueGrey,
         child: Icon(
           Icons.create,
           size: 20.0,
