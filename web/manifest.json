@@ -1,6 +1,6 @@
 {
-    "name": "flutter_drawing_app",
-    "short_name": "flutter_drawing_app",
+    "name": "DrawingApp",
+    "short_name": "DrawingAppTN",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

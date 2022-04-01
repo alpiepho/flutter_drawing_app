@@ -1,14 +1,10 @@
 import 'dart:async';
-// import 'dart:typed_data';
-// import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:drawing_app/drawn_line.dart';
 import 'package:drawing_app/sketcher.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'package:flutter/rendering.dart';
-// import 'package:flutter/services.dart';
-// import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 class DrawingPage extends StatefulWidget {
   @override
@@ -89,6 +85,30 @@ class _DrawingPageState extends State<DrawingPage> {
 
   @override
   Widget build(BuildContext context) {
+    var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    if (!kIsWeb && !isPortrait) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Container(
+            width: 1000,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                new Text(
+                  "Landscape mode is not supported.",
+                  style: Theme.of(context).textTheme.headline3.copyWith(
+                        color: Colors.white,
+                      ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.yellow[50],
       body: Stack(

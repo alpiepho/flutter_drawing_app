@@ -17,12 +17,22 @@ This was derived from a tutorial at: https://www.raywenderlich.com/25237210-buil
 
 - [x] hide save button (wont work on web)
 - [x] add hide of settings
-- [ ] more readme about using screen shot instead of save
 - [x] about/help link, try bottom modal (name?)
+- [x] icons and favicon
+- [x] convert to PWA
 - [ ] qr
-- [ ] icons and favicon
-- [ ] convert to PWA
+- [ ] more readme about using screen shot instead of save
 - [ ] try hive for saved state
+- [ ] toolboxes in landscape
+- [ ] small size is hard to touch
+- [ ] color selector
+- [ ] more sizes
+- [ ] protected area is blue, what background
+- [ ] select background color
+- [ ] gear and settings with help
+
+Question: when is it done?
+
 
 
 
