@@ -1,6 +1,8 @@
 import 'package:drawing_app/drawing_page.dart';
 import 'package:flutter/material.dart';
 
+import 'config/theme.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -11,9 +13,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Drawing App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: theme(),
+      // ThemeData(
+      //   primarySwatch: Colors.blue,
+      // ),
       home: DrawingPage(),
     );
   }

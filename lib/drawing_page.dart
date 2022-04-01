@@ -1,13 +1,14 @@
 import 'dart:async';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
+// import 'dart:typed_data';
+// import 'dart:ui' as ui;
 
 import 'package:drawing_app/drawn_line.dart';
 import 'package:drawing_app/sketcher.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:url_launcher/url_launcher.dart';
+// import 'package:flutter/rendering.dart';
+// import 'package:flutter/services.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 class DrawingPage extends StatefulWidget {
   @override
@@ -27,31 +28,57 @@ class _DrawingPageState extends State<DrawingPage> {
   StreamController<DrawnLine> currentLineStreamController =
       StreamController<DrawnLine>.broadcast();
 
-  Future<void> save() async {
-    try {
-      RenderRepaintBoundary boundary =
-          _globalKey.currentContext.findRenderObject() as RenderRepaintBoundary;
-      ui.Image image = await boundary.toImage();
-      ByteData byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
-      Uint8List pngBytes = byteData.buffer.asUint8List();
-      var saved = await ImageGallerySaver.saveImage(
-        pngBytes,
-        quality: 100,
-        name: DateTime.now().toIso8601String() + ".png",
-        isReturnImagePathOfIOS: true,
-      );
-      print(saved);
-    } catch (e) {
-      print(e);
-    }
-  }
-
   Future<void> clear() async {
     setState(() {
       lines = [];
       line = null;
     });
+  }
+
+  Future<void> help() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Wrap(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                        child: Text(
+                      "For more details:",
+                      style: Theme.of(context).textTheme.headline3,
+                    )),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    GestureDetector(
+                      child: Center(
+                        child: Text(
+                          "flutter_drawing_app/README",
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline3
+                              .copyWith(color: Colors.blue),
+                        ),
+                      ),
+                      onTap: onHelp,
+                    ),
+                  ]),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> onHelp() async {
+    await launch(
+        'https://github.com/alpiepho/flutter_drawing_app/blob/master/README.md');
+    Navigator.of(context).pop();
   }
 
   Future<void> hide() async {
@@ -68,8 +95,10 @@ class _DrawingPageState extends State<DrawingPage> {
         children: [
           buildAllPaths(context),
           buildCurrentPath(context),
+          buildHelpToolbar(),
           buildStrokeToolbar(),
           buildColorToolbar(),
+          buildHideToolbar(),
         ],
       ),
     );
@@ -146,6 +175,37 @@ class _DrawingPageState extends State<DrawingPage> {
     linesStreamController.add(lines);
   }
 
+  Widget buildHelpToolbar() {
+    final children = hidden
+        ? []
+        : [
+            buildHelpButton(),
+          ];
+    return Positioned(
+      bottom: 50.0,
+      right: 10.0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [...children],
+      ),
+    );
+  }
+
+  Widget buildHelpButton() {
+    return GestureDetector(
+      onTap: help,
+      child: CircleAvatar(
+        backgroundColor: Colors.transparent,
+        child: Icon(
+          Icons.question_mark,
+          size: 30.0,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
+
   Widget buildStrokeToolbar() {
     final children = hidden
         ? []
@@ -155,7 +215,7 @@ class _DrawingPageState extends State<DrawingPage> {
             buildStrokeButton(15.0),
           ];
     return Positioned(
-      bottom: 100.0,
+      bottom: 150.0,
       right: 10.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -188,9 +248,6 @@ class _DrawingPageState extends State<DrawingPage> {
     final children = hidden
         ? []
         : [
-            Divider(
-              height: 20.0,
-            ),
             buildClearButton(),
             Divider(
               height: 20.0,
@@ -204,13 +261,12 @@ class _DrawingPageState extends State<DrawingPage> {
             buildColorButton(Colors.white),
           ];
     return Positioned(
-      top: 40.0,
+      top: 90.0,
       right: 10.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          buildHideButton(),
           ...children,
         ],
       ),
@@ -242,6 +298,20 @@ class _DrawingPageState extends State<DrawingPage> {
           size: 20.0,
           color: Colors.white,
         ),
+      ),
+    );
+  }
+
+  Widget buildHideToolbar() {
+    return Positioned(
+      top: 20.0,
+      right: 15.0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          buildHideButton(),
+        ],
       ),
     );
   }

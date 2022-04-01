@@ -15,7 +15,7 @@ This was derived from a tutorial at: https://www.raywenderlich.com/25237210-buil
 - [x] hide save button (wont work on web)
 - [x] add hide of settings
 - [ ] more readme about using screen shot instead of save
-- [ ] about/help link, try bottom modal (name?)
+- [x] about/help link, try bottom modal (name?)
 - [ ] qr
 - [ ] icons and favicon
 - [ ] convert to PWA
