@@ -3,9 +3,9 @@
     "short_name": "DrawingAppTN",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "Flutter Drawing App.",
+    "background_color": "#FFFDE7",
+    "theme_color": "#FFFDE7",
+    "description": "DrawingApp TN",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
