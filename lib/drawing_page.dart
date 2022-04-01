@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:drawing_app/drawn_line.dart';
 import 'package:drawing_app/sketcher.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +87,7 @@ class _DrawingPageState extends State<DrawingPage> {
     var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
     return Scaffold(
-      backgroundColor: Color(0xFFFFFDE7)5, 253, 231, 1),
+      backgroundColor: Color(0xFFFFFDE7),
       body: Stack(
         children: [
           buildAllPaths(context),
