@@ -4,9 +4,9 @@ const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
   "version.json": "acf82881d3dda286816e721239f57427",
-"index.html": "e665227a963ac7126e67bd0497ac6beb",
-"/": "e665227a963ac7126e67bd0497ac6beb",
-"main.dart.js": "14a7791a9c249acb1ee9b53803ec6bc8",
+"index.html": "438a21fce7b02602fdb1e0d0b8611b41",
+"/": "438a21fce7b02602fdb1e0d0b8611b41",
+"main.dart.js": "08b0acab56c1da85b8979b53d3cf27d1",
 "favicon.png": "31b622beb97b33978784e3095bf93541",
 "icons/1024.png": "59e0094aaee3a1fab128a320909168b2",
 "icons/60.png": "6371c41679aeb184e8c1117f59888539",
@@ -23,27 +23,23 @@ const RESOURCES = {
 "icons/57.png": "9a83d9d4490e7986b97fe3bf7ab91c89",
 "icons/40.png": "e047b5f824bfd065af5a6e90f3e5a2a8",
 "icons/87.png": "e68e60424ceb7e179764771b36152258",
-"manifest.json": "0d1ea88c48dd3795e4f51c0b56a6c068",
+"manifest.json": "24a1ed08a0bac89495d505b96c68dc95",
 "assets/AssetManifest.json": "2efbb41d7877d10aac9d091f58ccd7b9",
 "assets/NOTICES": "9c7f843f11fbd2bdfc612f25a003f69a",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
-"assets/fonts/MaterialIcons-Regular.otf": "7e7a6cccddf6d7b20012a548461d5d81",
-"canvaskit/canvaskit.js": "c2b4e5f3d7a3d82aed024e7249a78487",
-"canvaskit/profiling/canvaskit.js": "ae2949af4efc61d28a4a80fffa1db900",
-"canvaskit/profiling/canvaskit.wasm": "95e736ab31147d1b2c7b25f11d4c32cd",
-"canvaskit/canvaskit.wasm": "4b83d89d9fecbea8ca46f2f760c5a9ba"
+"assets/fonts/MaterialIcons-Regular.otf": "7e7a6cccddf6d7b20012a548461d5d81"
 };
 
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = [
-  "https://alpiepho.github.io/flutter_drawing_app/",
-"https://alpiepho.github.io/flutter_drawing_app/main.dart.js",
-"https://alpiepho.github.io/flutter_drawing_app/index.html",
-"https://alpiepho.github.io/flutter_drawing_app/assets/NOTICES",
-"https://alpiepho.github.io/flutter_drawing_app/assets/AssetManifest.json",
-"https://alpiepho.github.io/flutter_drawing_app/assets/FontManifest.json"];
+  "/",
+"main.dart.js",
+"index.html",
+"assets/NOTICES",
+"assets/AssetManifest.json",
+"assets/FontManifest.json"];
 // During install, the TEMP cache is populated with the application shell files.
 self.addEventListener("install", (event) => {
   self.skipWaiting();
