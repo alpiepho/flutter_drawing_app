@@ -210,8 +210,8 @@ class _DrawingPageState extends State<DrawingPage> {
 
   void buildGrid(BuildContext context) {
     var gridShowing = (lines.length > 0 && lines.first.width == 1.0);
-    var width = MediaQuery.of(context).size.width.round();
-    var height = MediaQuery.of(context).size.height.round();
+    var width = 2000; //MediaQuery.of(context).size.width.round();
+    var height = 2000; //MediaQuery.of(context).size.height.round();
 
     if (showGrid && !gridShowing) {
       var x = 0;
