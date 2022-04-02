@@ -14,9 +14,14 @@ class _DrawingPageState extends State<DrawingPage> {
   GlobalKey _globalKey = new GlobalKey();
   List<DrawnLine> lines = <DrawnLine>[];
   DrawnLine line;
+  Offset lastPoint;
   Color selectedColor = Colors.black;
   double selectedWidth = 5.0;
   bool hidden = false;
+  int gridSize = 10;
+  bool showGrid = false;
+  bool snapToGrid = false;
+  bool straightLines = false;
 
   StreamController<List<DrawnLine>> linesStreamController =
       StreamController<List<DrawnLine>>.broadcast();
@@ -50,11 +55,33 @@ class _DrawingPageState extends State<DrawingPage> {
                     Divider(
                       height: 20.0,
                     ),
-                    Center(
-                        child: Text(
-                      "For more details:",
-                      style: Theme.of(context).textTheme.headline3,
-                    )),
+                    Container(
+                      width: 300,
+                      child: CheckboxListTile(
+                        title: Text('Show Grid Lines'),
+                        onChanged: onShowGrid,
+                        value: showGrid,
+                      ),
+                    ),
+                    Container(
+                      width: 300,
+                      child: CheckboxListTile(
+                        title: Text('Snap to Grid'),
+                        onChanged: onSnapToGrid,
+                        value: snapToGrid,
+                      ),
+                    ),
+                    Container(
+                      width: 300,
+                      child: CheckboxListTile(
+                        title: Text('Only Straight Lines'),
+                        onChanged: onStraightLines,
+                        value: straightLines,
+                      ),
+                    ),
+                    Divider(
+                      height: 20.0,
+                    ),
                     SizedBox(
                       height: 20.0,
                     ),
@@ -76,6 +103,27 @@ class _DrawingPageState extends State<DrawingPage> {
         );
       },
     );
+  }
+
+  Future<void> onShowGrid(bool value) async {
+    setState(() {
+      showGrid = !showGrid;
+    });
+    Navigator.of(context).pop();
+  }
+
+  Future<void> onSnapToGrid(bool value) async {
+    setState(() {
+      snapToGrid = !snapToGrid;
+    });
+    Navigator.of(context).pop();
+  }
+
+  Future<void> onStraightLines(bool value) async {
+    setState(() {
+      straightLines = !straightLines;
+    });
+    Navigator.of(context).pop();
   }
 
   Future<void> onHelp() async {
@@ -137,6 +185,7 @@ class _DrawingPageState extends State<DrawingPage> {
   }
 
   Widget buildAllPaths(BuildContext context) {
+    buildGrid(context);
     return RepaintBoundary(
       key: _globalKey,
       child: Container(
@@ -159,12 +208,23 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
+  void buildGrid(BuildContext context) {
+    if (showGrid) {
+      var width = MediaQuery.of(context).size.width;
+      var height = MediaQuery.of(context).size.height;
+      List<Offset> path = [Offset(10.0, 0.0), Offset(10.0, height)];
+      DrawnLine gridLine = DrawnLine(path, Colors.black12, 1.0);
+
+      lines.insert(0, gridLine);
+    }
+  }
+
   void onPanStart(DragStartDetails details) {
     if (hidden) {
       return;
     }
     RenderBox box = context.findRenderObject();
-    Offset point = box.globalToLocal(details.globalPosition);
+    Offset point = gridPoint(box.globalToLocal(details.globalPosition));
     line = DrawnLine([point], selectedColor, selectedWidth);
   }
 
@@ -173,19 +233,42 @@ class _DrawingPageState extends State<DrawingPage> {
       return;
     }
     RenderBox box = context.findRenderObject();
-    Offset point = box.globalToLocal(details.globalPosition);
-
-    List<Offset> path = List.from(line.path)..add(point);
-    line = DrawnLine(path, selectedColor, selectedWidth);
-    currentLineStreamController.add(line);
+    Offset point = gridPoint(box.globalToLocal(details.globalPosition));
+    if (straightLines) {
+      // wont show as drawn, just keep last point
+      lastPoint = point;
+    } else {
+      List<Offset> path = List.from(line.path)..add(point);
+      line = DrawnLine(path, selectedColor, selectedWidth);
+      currentLineStreamController.add(line);
+    }
   }
 
   void onPanEnd(DragEndDetails details) {
     if (hidden) {
       return;
     }
+    if (straightLines) {
+      // finally draw the straight  line
+      List<Offset> path = List.from(line.path)..add(lastPoint);
+      line = DrawnLine(path, selectedColor, selectedWidth);
+      currentLineStreamController.add(line);
+    }
     lines = List.from(lines)..add(line);
     linesStreamController.add(lines);
+  }
+
+  Offset gridPoint(Offset point) {
+    if (snapToGrid) {
+      return Offset(gridX(point.dx), gridX(point.dy));
+    }
+    return point;
+  }
+
+  double gridX(double x) {
+    int ix = x.round();
+    ix = ((ix ~/ gridSize) * gridSize);
+    return ix as double;
   }
 
   Widget buildHelpToolbar(bool isPortrait) {
@@ -347,7 +430,7 @@ class _DrawingPageState extends State<DrawingPage> {
       child: CircleAvatar(
         backgroundColor: Colors.blueGrey,
         child: Icon(
-          Icons.create,
+          Icons.create, //.remove, //.undo, //.create,
           size: 20.0,
           color: Colors.white,
         ),
