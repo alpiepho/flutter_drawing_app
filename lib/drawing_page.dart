@@ -49,7 +49,7 @@ class _DrawingPageState extends State<DrawingPage> {
                   children: [
                     Center(
                         child: Text(
-                      "Version: 0.1",
+                      "Version 0.1",
                       style: Theme.of(context).textTheme.headline3,
                     )),
                     Divider(
@@ -209,13 +209,36 @@ class _DrawingPageState extends State<DrawingPage> {
   }
 
   void buildGrid(BuildContext context) {
-    if (showGrid) {
-      var width = MediaQuery.of(context).size.width;
-      var height = MediaQuery.of(context).size.height;
-      List<Offset> path = [Offset(10.0, 0.0), Offset(10.0, height)];
-      DrawnLine gridLine = DrawnLine(path, Colors.black12, 1.0);
+    var gridShowing = (lines.length > 0 && lines.first.width == 1.0);
+    var width = MediaQuery.of(context).size.width.round();
+    var height = MediaQuery.of(context).size.height.round();
 
-      lines.insert(0, gridLine);
+    if (showGrid && !gridShowing) {
+      var x = 0;
+      while (x < width) {
+        List<Offset> path = [
+          Offset(x as double, 0.0),
+          Offset(x as double, height as double)
+        ];
+        DrawnLine gridLine = DrawnLine(path, Colors.black12, 1.0);
+        lines.insert(0, gridLine);
+        x += gridSize;
+      }
+      var y = 0;
+      while (y < height) {
+        List<Offset> path = [
+          Offset(0.0, y as double),
+          Offset(width as double, y as double)
+        ];
+        DrawnLine gridLine = DrawnLine(path, Colors.black12, 1.0);
+        lines.insert(0, gridLine);
+        y += gridSize;
+      }
+    }
+    if (!showGrid && gridShowing) {
+      while (lines.length > 0 && lines.first.width == 1.0) {
+        lines.removeAt(0);
+      }
     }
   }
 

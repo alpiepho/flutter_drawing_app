@@ -44,12 +44,15 @@ More features will certainly be added.  Stay tuned.
 - [x] small size is hard to touch
 - [x] protected area is blue, what background
 - [x] gear and settings with help
+- [x] qr
+- [x] more readme about using screen shot instead of save
+- [x] grid lines
+- [x] snap to grid
+- [x] straight lines
 
 
 ## TODO
 
-- [ ] qr
-- [ ] more readme about using screen shot instead of save
 - [ ] undo button
 - [ ] try hive for saved state
 - [ ] color selector
