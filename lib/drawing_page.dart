@@ -5,6 +5,15 @@ import 'package:drawing_app/sketcher.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+enum ClearMode {
+  all,
+  line,
+  point,
+  redoAll,
+  redoLine,
+  redoPoint,
+}
+
 class DrawingPage extends StatefulWidget {
   @override
   _DrawingPageState createState() => _DrawingPageState();
@@ -15,6 +24,9 @@ class _DrawingPageState extends State<DrawingPage> {
   List<DrawnLine> lines = <DrawnLine>[];
   DrawnLine line;
   Offset lastPoint;
+  List<DrawnLine> lastLines = <DrawnLine>[];
+  List<Offset> lastPoints = <Offset>[];
+
   Color selectedColor = Colors.black;
   double selectedWidth = 5.0;
   bool hidden = false;
@@ -22,6 +34,7 @@ class _DrawingPageState extends State<DrawingPage> {
   bool showGrid = false;
   bool snapToGrid = false;
   bool straightLines = false;
+  ClearMode clearMode = ClearMode.all;
 
   StreamController<List<DrawnLine>> linesStreamController =
       StreamController<List<DrawnLine>>.broadcast();
@@ -30,8 +43,75 @@ class _DrawingPageState extends State<DrawingPage> {
 
   Future<void> clear() async {
     setState(() {
-      lines = [];
-      line = null;
+      switch (clearMode) {
+        case ClearMode.all:
+          lastLines = lines;
+          lines = [];
+          line = null;
+          break;
+        case ClearMode.line:
+          if (lines.length > 0) {
+            lastLines.add(lines.last);
+            lines.removeLast();
+          }
+          break;
+        case ClearMode.point:
+          if (lines.length > 0) {
+            if (lines.last.path.length > 0) {
+              lastPoints.add(lines.last.path.last);
+              lines.last.path.removeLast();
+            } else {
+              lastLines.add(lines.last);
+              lines.removeLast();
+            }
+          }
+          break;
+        case ClearMode.redoAll:
+          if (lastLines.length > 0) {
+            lines = lastLines;
+            lastLines = <DrawnLine>[];
+          }
+          break;
+        case ClearMode.redoLine:
+          if (lastLines.length > 0) {
+            lines.add(lastLines.last);
+            lastLines.removeLast();
+          }
+          break;
+        case ClearMode.redoPoint:
+          if (lastPoints.length > 0) {
+            if (lines.length > 0) {
+              lines.last.path.add(lastPoints.last);
+              lastPoints.removeLast();
+            }
+          }
+          break;
+      }
+    });
+  }
+
+  Future<void> changeClearMode() async {
+    setState(() {
+      switch (clearMode) {
+        case ClearMode.all:
+          clearMode = ClearMode.line;
+          break;
+        case ClearMode.line:
+          clearMode = ClearMode.point;
+          break;
+        case ClearMode.point:
+          clearMode = ClearMode.redoAll;
+          break;
+        case ClearMode.redoAll:
+          clearMode = ClearMode.redoLine;
+          break;
+        case ClearMode.redoLine:
+          clearMode = ClearMode.redoPoint;
+          break;
+        case ClearMode.redoPoint:
+          clearMode = ClearMode.all;
+          break;
+      }
     });
   }
 
@@ -392,6 +472,7 @@ class _DrawingPageState extends State<DrawingPage> {
         ? []
         : [
             buildClearButton(),
+            buildChangeClearButton(),
             SizedBox(
               height: 20.0,
               width: 20.0,
@@ -448,14 +529,48 @@ class _DrawingPageState extends State<DrawingPage> {
   }
 
   Widget buildClearButton() {
+    var icon;
+    switch (clearMode) {
+      case ClearMode.all:
+        icon = Icons.create;
+        break;
+      case ClearMode.line:
+        icon = Icons.undo;
+        break;
+      case ClearMode.point:
+        icon = Icons.remove;
+        break;
+      case ClearMode.redoAll:
+        icon = Icons.fast_forward;
+        break;
+      case ClearMode.redoLine:
+        icon = Icons.redo;
+        break;
+      case ClearMode.redoPoint:
+        icon = Icons.add;
+        break;
+    }
     return GestureDetector(
       onTap: clear,
       child: CircleAvatar(
         backgroundColor: Colors.blueGrey,
         child: Icon(
-          Icons.create, //.remove, //.undo, //.create,
+          icon,
           size: 20.0,
           color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Widget buildChangeClearButton() {
+    return GestureDetector(
+      onTap: changeClearMode,
+      child: CircleAvatar(
+        backgroundColor: Colors.transparent,
+        child: Text(
+          "...",
+          style: Theme.of(context).textTheme.headline3,
         ),
       ),
     );

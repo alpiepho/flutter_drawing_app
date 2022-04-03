@@ -26,6 +26,16 @@ Using your finger, you can draw random shapes.  Use the "pencil" icon to clear t
 
 The arrow/chevron at the top or left allows hiding all controls so you can take a screen shot to save drawings.  It also disables drawing so you don't add unwanted lines, say to switch apps on an iPhone.
 
+There are various clear options associated with the 'pencil' button:
+- clear all
+- undo last line
+- undo last point
+- redo all (TBD)
+- redo last line (TBD)
+- redo last point (TBD)
+Tap the '...' below the  'pencil' button to switch modes.
+
+
 More features will certainly be added.  Stay tuned.
 
 
@@ -49,15 +59,19 @@ More features will certainly be added.  Stay tuned.
 - [x] grid lines
 - [x] snap to grid
 - [x] straight lines
+- [x] undo button
+- [x] redo
 
 
 ## TODO
 
-- [ ] undo button
+- [ ] eraser
+- [ ] button hover?
+- [ ] scale toolboxes to fit mobile browser
+- [ ] refactor large main file
 - [ ] try hive for saved state
 - [ ] color selector
 - [ ] more sizes
-- [ ] select background color?
 
 Question: when is it done?
 
