@@ -63,6 +63,7 @@ class _DrawingPageState extends State<DrawingPage> {
 
   // for settings model to be saved in hive? overkill?
   Color selectedColor = Colors.black;
+  Color nextColor = Colors.black;
   double selectedWidth = 5.0;
   bool hidden = false;
   bool showMessages = true;
@@ -337,7 +338,7 @@ class _DrawingPageState extends State<DrawingPage> {
   }
 
   Future<void> onColorAddChange(Color color) async {
-    if (color == selectedColor) {
+    if (color == nextColor) {
       return;
     }
     if (colorsAvailable.length >= 32) {
@@ -346,11 +347,10 @@ class _DrawingPageState extends State<DrawingPage> {
       return;
     }
     setState(() {
-      colorsAvailable.add(color);
-      selectedColor = color;
+      nextColor = color;
     });
     toPrefs();
-    Navigator.of(context).pop();
+    //Navigator.of(context).pop();
   }
 
   Future<void> onHelp() async {
@@ -388,6 +388,10 @@ class _DrawingPageState extends State<DrawingPage> {
             TextButton(
               child: const Text('Done'),
               onPressed: () {
+                setState(() {
+                  colorsAvailable.insert(0, nextColor);
+                  selectedColor = nextColor;
+                });
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
