@@ -335,23 +335,17 @@ class _DrawingPageState extends State<DrawingPage> {
     Navigator.of(context).pop();
   }
 
-  Future<void> onColorSelectChange(Color color) async {
+  Future<void> onColorAddChange(Color color) async {
     if (color == selectedColor) {
       return;
     }
-    if (selectedColor == Colors.black || selectedColor == Color(0xFFFFFDE7)) {
+    if (colorsAvailable.length >= 32) {
       Navigator.of(context).pop();
-      ShowSnackbarLong('cannot change color');
+      ShowSnackbarLong('too many colors');
       return;
     }
     setState(() {
       colorsAvailable.add(color);
-      // for (int i = 0; i < colorsAvailable.length; i++) {
-      //   if (colorsAvailable[i] == selectedColor) {
-      //     colorsAvailable[i] = color;
-      //     selectedColor = color;
-      //   }
-      // }
     });
     toPrefs();
     Navigator.of(context).pop();
@@ -381,11 +375,11 @@ class _DrawingPageState extends State<DrawingPage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Pick a color!'),
+          title: const Text('Add a color! (EXPERIMENTAL)'),
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: selectedColor,
-              onColorChanged: onColorSelectChange,
+              onColorChanged: onColorAddChange,
             ),
           ),
           actions: <Widget>[
@@ -453,6 +447,20 @@ class _DrawingPageState extends State<DrawingPage> {
     snapToGrid = prefs.getBool('snapToGrid') ?? false;
     straightLines = prefs.getBool('straightLines') ?? false;
 
+    // var count = prefs.getInt('colorsAvailableLength') ?? 0;
+    // if (count > 0) {
+    //   colorsAvailable = [];
+    //   //defaultColorsAvailable;
+    //   for (int index = 0; index < count; index++) {
+    //     var colorValue =
+    //         prefs.getInt('colorsAvailable' + index.toString()) ?? 0;
+    //     if (colorValue != 0) {
+    //       print('colorsAvailable' + index.toString());
+    //       colorsAvailable.add(Color(colorValue));
+    //     }
+    //   }
+    // }
+    // print(colorsAvailable.length.toString());
     return true;
   }
 
@@ -467,6 +475,14 @@ class _DrawingPageState extends State<DrawingPage> {
     prefs.setBool('showGrid', showGrid);
     prefs.setBool('snapToGrid', snapToGrid);
     prefs.setBool('straightLines', straightLines);
+
+    prefs.setInt('colorsAvailableLength', colorsAvailable.length);
+    int index = 0;
+    for (Color color in colorsAvailable) {
+      temp = color.value;
+      prefs.setInt('colorsAvailable' + index.toString(), temp);
+      index++;
+    }
   }
 
   Widget buildCurrentPath(BuildContext context) {

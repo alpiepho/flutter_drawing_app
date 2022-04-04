@@ -80,11 +80,11 @@ Color Picker should not close until Done.
 - [x] more sizes
 - [x] saved prefrenes for saved state
 - [x] color selector
-- [x] save colors
 - [x] reset colors
 
 
 ## TODO
+- [ ] save colors
 - [ ] fix color picker closing immediately
 - [ ] fix redo point from line 1 to line 2, no break
 - [ ] refactor large main file
