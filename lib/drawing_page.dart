@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:drawing_app/drawn_line.dart';
 import 'package:drawing_app/sketcher.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 enum ClearMode {
@@ -256,6 +257,7 @@ class _DrawingPageState extends State<DrawingPage> {
     setState(() {
       showMessages = !showMessages;
     });
+    toPrefs();
     Navigator.of(context).pop();
   }
 
@@ -263,6 +265,7 @@ class _DrawingPageState extends State<DrawingPage> {
     setState(() {
       showGrid = !showGrid;
     });
+    toPrefs();
     Navigator.of(context).pop();
   }
 
@@ -270,6 +273,7 @@ class _DrawingPageState extends State<DrawingPage> {
     setState(() {
       snapToGrid = !snapToGrid;
     });
+    toPrefs();
     Navigator.of(context).pop();
   }
 
@@ -277,6 +281,7 @@ class _DrawingPageState extends State<DrawingPage> {
     setState(() {
       straightLines = !straightLines;
     });
+    toPrefs();
     Navigator.of(context).pop();
   }
 
@@ -296,19 +301,61 @@ class _DrawingPageState extends State<DrawingPage> {
   Widget build(BuildContext context) {
     var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
-    return Scaffold(
-      backgroundColor: Color(0xFFFFFDE7),
-      body: Stack(
-        children: [
-          buildAllPaths(context),
-          buildCurrentPath(context),
-          buildHelpToolbar(isPortrait),
-          buildStrokeToolbar(isPortrait),
-          buildColorToolbar(isPortrait),
-          buildHideToolbar(isPortrait),
-        ],
-      ),
+    return FutureBuilder(
+      future: fromPrefs(),
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<dynamic> snapshot,
+      ) {
+        if (snapshot.hasData) {
+          // Return page after reading preferences
+          return Scaffold(
+            backgroundColor: Color(0xFFFFFDE7),
+            body: Stack(
+              children: [
+                buildAllPaths(context),
+                buildCurrentPath(context),
+                buildHelpToolbar(isPortrait),
+                buildStrokeToolbar(isPortrait),
+                buildColorToolbar(isPortrait),
+                buildHideToolbar(isPortrait),
+              ],
+            ),
+          );
+        } else {
+          // Return loading screen while reading preferences
+          return Center(child: CircularProgressIndicator());
+        }
+      },
     );
+  }
+
+  Future<bool> fromPrefs() async {
+    var prefs = await SharedPreferences.getInstance();
+
+    //int colorValue = prefs.getInt('selectedColor') ?? 0xff000000;
+    //selectedColor = Color(colorValue);
+    selectedWidth = prefs.getDouble('selectedWidth') ?? 5.0;
+    hidden = prefs.getBool('hidden') ?? false;
+    showMessages = prefs.getBool('showMessages') ?? true;
+    showGrid = prefs.getBool('showGrid') ?? false;
+    snapToGrid = prefs.getBool('snapToGrid') ?? false;
+    straightLines = prefs.getBool('straightLines') ?? false;
+
+    return true;
+  }
+
+  Future<void> toPrefs() async {
+    var prefs = await SharedPreferences.getInstance();
+
+    // int temp = selectedColor as int;
+    // prefs.setInt('temp', temp);
+    prefs.setDouble('selectedWidth', selectedWidth);
+    prefs.setBool('hidden', hidden);
+    prefs.setBool('showMessages', showMessages);
+    prefs.setBool('showGrid', showGrid);
+    prefs.setBool('snapToGrid', snapToGrid);
+    prefs.setBool('straightLines', straightLines);
   }
 
   Widget buildCurrentPath(BuildContext context) {
@@ -539,6 +586,7 @@ class _DrawingPageState extends State<DrawingPage> {
         setState(() {
           selectedWidth = strokeWidth;
         });
+        toPrefs();
       },
       child: Container(
         padding: const EdgeInsets.all(12.0),
@@ -629,6 +677,7 @@ class _DrawingPageState extends State<DrawingPage> {
           setState(() {
             selectedColor = color;
           });
+          toPrefs();
         },
       ),
     );

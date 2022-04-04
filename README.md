@@ -30,13 +30,21 @@ There are various clear options associated with the 'pencil' button:
 - clear all
 - undo last line
 - undo last point
-- redo all (TBD)
-- redo last line (TBD)
-- redo last point (TBD)
+- redo all
+- redo last line
+- redo last point
 Tap the '...' below the  'pencil' button to switch modes.
+
+The set of supported colors is greater than the 3 shown.  Use the '...' to shuffle thru the colors.  Also, use the background color to 'erase' (suggest a larger stroke size).
+
+The set of stroke size can also be shuffled using the '...'.
 
 
 More features will certainly be added.  Stay tuned.
+
+## Known Issue
+
+There is a know issue when redoing points over multiple line segments.  They will be connected.  To be fixed.
 
 
 ## Additions
@@ -68,10 +76,10 @@ More features will certainly be added.  Stay tuned.
 
 
 ## TODO
-- [ ] refactor large main file
 - [ ] try hive for saved state
 - [ ] color selector
 - [ ] fix redo point from line 1 to line 2, no break
+- [ ] refactor large main file
 
 Question: when is it done?
 
