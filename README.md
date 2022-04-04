@@ -46,6 +46,11 @@ More features will certainly be added.  Stay tuned.
 
 There is a know issue when redoing points over multiple line segments.  They will be connected.  To be fixed.
 
+The smallest stroke width can be difficult to press.  Has to do with how button is built.
+
+Selected color is not always the top color.
+
+Color Picker should not close until Done.
 
 ## Additions
 
@@ -74,12 +79,17 @@ There is a know issue when redoing points over multiple line segments.  They wil
 - [x] button hover or snackbar message
 - [x] more sizes
 - [x] saved prefrenes for saved state
+- [x] color selector
+- [x] save colors
+- [x] reset colors
 
 
 ## TODO
-- [ ] color selector
+- [ ] fix color picker closing immediately
 - [ ] fix redo point from line 1 to line 2, no break
 - [ ] refactor large main file
+- [ ] add tests
+- [ ] share with author
 
 Question: when is it done?
 

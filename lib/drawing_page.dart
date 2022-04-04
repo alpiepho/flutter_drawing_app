@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:drawing_app/drawn_line.dart';
 import 'package:drawing_app/sketcher.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,6 +30,17 @@ class _DrawingPageState extends State<DrawingPage> {
   List<DrawnLine> lastLines = <DrawnLine>[]; // for redo lines
   List<Offset> lastPoints = <Offset>[]; // for redo points
   ClearMode clearMode = ClearMode.all; // for toggle of clear button
+  List<Color> defaultColorsAvailable = <Color>[
+    // for shuffle colors
+    Colors.red,
+    Colors.blueAccent,
+    Colors.yellow,
+    Colors.green,
+    Colors.lightBlue,
+    Colors.black,
+    Colors.white,
+    Color(0xFFFFFDE7), // background to "erase"
+  ];
   List<Color> colorsAvailable = <Color>[
     // for shuffle colors
     Colors.red,
@@ -159,6 +171,17 @@ class _DrawingPageState extends State<DrawingPage> {
     }
   }
 
+  void ShowSnackbarLong(String text) {
+    if (showMessages) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(milliseconds: 2000),
+          content: Text(text),
+        ),
+      );
+    }
+  }
+
   Future<void> changeColors() async {
     setState(() {
       var last = colorsAvailable.last;
@@ -227,6 +250,23 @@ class _DrawingPageState extends State<DrawingPage> {
                         value: straightLines,
                       ),
                     ),
+                    Container(
+                      width: 300,
+                      child: GestureDetector(
+                        child: ListTile(
+                          title: Text('Reset Colors'),
+                          trailing: Icon(Icons.redo),
+                        ),
+                        onTap: onResetColors,
+                      ),
+                    ),
+                    Container(
+                      width: 300,
+                      child: ListTile(
+                        title: Text('Costomize Color'),
+                        trailing: buildColorSelectButton(),
+                      ),
+                    ),
                     Divider(
                       height: 20.0,
                     ),
@@ -285,10 +325,81 @@ class _DrawingPageState extends State<DrawingPage> {
     Navigator.of(context).pop();
   }
 
+  Future<void> onResetColors() async {
+    setState(() {
+      colorsAvailable = defaultColorsAvailable;
+      selectedColor = colorsAvailable[0];
+      // TODO rotate Color Toolkit to selected
+    });
+    toPrefs();
+    Navigator.of(context).pop();
+  }
+
+  Future<void> onColorSelectChange(Color color) async {
+    if (color == selectedColor) {
+      return;
+    }
+    if (selectedColor == Colors.black || selectedColor == Color(0xFFFFFDE7)) {
+      Navigator.of(context).pop();
+      ShowSnackbarLong('cannot change color');
+      return;
+    }
+    setState(() {
+      colorsAvailable.add(color);
+      // for (int i = 0; i < colorsAvailable.length; i++) {
+      //   if (colorsAvailable[i] == selectedColor) {
+      //     colorsAvailable[i] = color;
+      //     selectedColor = color;
+      //   }
+      // }
+    });
+    toPrefs();
+    Navigator.of(context).pop();
+  }
+
   Future<void> onHelp() async {
     await launch(
         'https://github.com/alpiepho/flutter_drawing_app/blob/master/README.md');
     Navigator.of(context).pop();
+  }
+
+  Widget buildColorSelectButton() {
+    return Padding(
+      padding: const EdgeInsets.all(0.0),
+      child: FloatingActionButton(
+        mini: true,
+        backgroundColor: selectedColor,
+        child: Container(),
+        onPressed: onSelectColor,
+      ),
+    );
+  }
+
+  Future<void> onSelectColor() async {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Pick a color!'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: selectedColor,
+              onColorChanged: onColorSelectChange,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Done'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> hide() async {
@@ -411,6 +522,7 @@ class _DrawingPageState extends State<DrawingPage> {
 
   void buildGrid(BuildContext context) {
     var gridShowing = (lines.length > 0 && lines.first.width == 1.0);
+    // using fixed size since rotate can change sizes and this is not dynamic
     var width = 2000; //MediaQuery.of(context).size.width.round();
     var height = 2000; //MediaQuery.of(context).size.height.round();
 
