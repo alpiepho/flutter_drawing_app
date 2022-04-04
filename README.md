@@ -87,6 +87,7 @@ Color Picker should not close until Done.
 - [ ] save colors
 - [ ] fix color picker closing immediately
 - [ ] fix redo point from line 1 to line 2, no break
+- [ ] fix debuging
 - [ ] refactor large main file
 - [ ] add tests
 - [ ] share with author
