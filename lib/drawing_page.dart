@@ -59,6 +59,7 @@ class _DrawingPageState extends State<DrawingPage> {
     20.0,
     25.0,
   ];
+  bool prefsRead = false;
 
   // for settings model to be saved in hive? overkill?
   Color selectedColor = Colors.black;
@@ -346,6 +347,7 @@ class _DrawingPageState extends State<DrawingPage> {
     }
     setState(() {
       colorsAvailable.add(color);
+      selectedColor = color;
     });
     toPrefs();
     Navigator.of(context).pop();
@@ -436,6 +438,11 @@ class _DrawingPageState extends State<DrawingPage> {
   }
 
   Future<bool> fromPrefs() async {
+    if (prefsRead) {
+      return true;
+    }
+    prefsRead = true;
+
     var prefs = await SharedPreferences.getInstance();
 
     int colorValue = prefs.getInt('selectedColor') ?? 0xff000000;
@@ -446,23 +453,18 @@ class _DrawingPageState extends State<DrawingPage> {
     snapToGrid = prefs.getBool('snapToGrid') ?? false;
     straightLines = prefs.getBool('straightLines') ?? false;
 
-    // var count = prefs.getInt('colorsAvailableLength') ?? 0;
-    // if (count > 0) {
-    //   colorsAvailable = [];
-    //   //defaultColorsAvailable;
-    //   for (int index = 0; index < count; index++) {
-    //     var colorValue =
-    //         prefs.getInt('colorsAvailable' + index.toString()) ?? 0;
-    //     if (colorValue != 0) {
-    //       print('colorsAvailable' +
-    //           index.toString() +
-    //           ' ' +
-    //           colorValue.toRadixString(16));
-    //       colorsAvailable.add(Color(colorValue));
-    //     }
-    //   }
-    // }
-    print(colorsAvailable.length.toString());
+    var count = prefs.getInt('colorsAvailableLength') ?? 0;
+    if (count > 0) {
+      colorsAvailable = [];
+      //defaultColorsAvailable;
+      for (int index = 0; index < count; index++) {
+        var colorValue =
+            prefs.getInt('colorsAvailable' + index.toString()) ?? 0;
+        if (colorValue != 0) {
+          colorsAvailable.add(Color(colorValue));
+        }
+      }
+    }
     return true;
   }
 
@@ -752,10 +754,6 @@ class _DrawingPageState extends State<DrawingPage> {
 
     for (Color color in colorsAvailable) {
       colorButtons.add(buildColorButton(color));
-      print('colorButtons' +
-          count.toString() +
-          ' ' +
-          color.value.toRadixString(16));
       if (count++ >= 3) break;
     }
     colorButtons.add(buildChangeColorsButton());
