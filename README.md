@@ -61,17 +61,17 @@ More features will certainly be added.  Stay tuned.
 - [x] straight lines
 - [x] undo button
 - [x] redo
+- [x] eraser
+- [x] scale toolboxes to fit mobile browser
+- [x] button hover or snackbar message
+- [x] more sizes
 
 
 ## TODO
-
-- [ ] eraser
-- [ ] button hover?
-- [ ] scale toolboxes to fit mobile browser
 - [ ] refactor large main file
 - [ ] try hive for saved state
 - [ ] color selector
-- [ ] more sizes
+- [ ] fix redo point from line 1 to line 2, no break
 
 Question: when is it done?
 

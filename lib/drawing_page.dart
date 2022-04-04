@@ -23,18 +23,38 @@ class _DrawingPageState extends State<DrawingPage> {
   GlobalKey _globalKey = new GlobalKey();
   List<DrawnLine> lines = <DrawnLine>[];
   DrawnLine line;
-  Offset lastPoint;
-  List<DrawnLine> lastLines = <DrawnLine>[];
-  List<Offset> lastPoints = <Offset>[];
+  int gridSize = 10;
+  Offset lastPoint; // for straightLines
+  List<DrawnLine> lastLines = <DrawnLine>[]; // for redo lines
+  List<Offset> lastPoints = <Offset>[]; // for redo points
+  ClearMode clearMode = ClearMode.all; // for toggle of clear button
+  List<Color> colorsAvailable = <Color>[
+    // for shuffle colors
+    Colors.red,
+    Colors.blueAccent,
+    Colors.yellow,
+    Colors.green,
+    Colors.lightBlue,
+    Colors.black,
+    Colors.white,
+    Color(0xFFFFFDE7), // background to "erase"
+  ];
+  List<double> strokesAvailable = <double>[
+    5.0,
+    10.0,
+    15.0,
+    20.0,
+    25.0,
+  ];
 
+  // for settings model to be saved in hive? overkill?
   Color selectedColor = Colors.black;
   double selectedWidth = 5.0;
   bool hidden = false;
-  int gridSize = 10;
+  bool showMessages = true;
   bool showGrid = false;
   bool snapToGrid = false;
   bool straightLines = false;
-  ClearMode clearMode = ClearMode.all;
 
   StreamController<List<DrawnLine>> linesStreamController =
       StreamController<List<DrawnLine>>.broadcast();
@@ -52,7 +72,13 @@ class _DrawingPageState extends State<DrawingPage> {
         case ClearMode.line:
           if (lines.length > 0) {
             lastLines.add(lines.last);
-            lines.removeLast();
+            if (lines.length == 1) {
+              lines = [];
+              line = null;
+            } else {
+              lines.removeLast();
+              line = null;
+            }
           }
           break;
         case ClearMode.point:
@@ -95,23 +121,56 @@ class _DrawingPageState extends State<DrawingPage> {
       switch (clearMode) {
         case ClearMode.all:
           clearMode = ClearMode.line;
+          ShowSnackbar('clear line');
           break;
         case ClearMode.line:
           clearMode = ClearMode.point;
+          ShowSnackbar('clear point');
           break;
         case ClearMode.point:
           clearMode = ClearMode.redoAll;
+          ShowSnackbar('redo all');
           break;
         case ClearMode.redoAll:
           clearMode = ClearMode.redoLine;
+          ShowSnackbar('redo line');
           break;
         case ClearMode.redoLine:
           clearMode = ClearMode.redoPoint;
+          ShowSnackbar('redo point');
           break;
         case ClearMode.redoPoint:
           clearMode = ClearMode.all;
+          ShowSnackbar('clear all');
           break;
       }
+    });
+  }
+
+  void ShowSnackbar(String text) {
+    if (showMessages) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(milliseconds: 250),
+          content: Text(text),
+        ),
+      );
+    }
+  }
+
+  Future<void> changeColors() async {
+    setState(() {
+      var last = colorsAvailable.last;
+      colorsAvailable.removeLast();
+      colorsAvailable.insert(0, last);
+    });
+  }
+
+  Future<void> changeStrokes() async {
+    setState(() {
+      var last = strokesAvailable.last;
+      strokesAvailable.removeLast();
+      strokesAvailable.insert(0, last);
     });
   }
 
@@ -134,6 +193,14 @@ class _DrawingPageState extends State<DrawingPage> {
                     )),
                     Divider(
                       height: 20.0,
+                    ),
+                    Container(
+                      width: 300,
+                      child: CheckboxListTile(
+                        title: Text('Show Messages'),
+                        onChanged: onShowMessages,
+                        value: showMessages,
+                      ),
                     ),
                     Container(
                       width: 300,
@@ -183,6 +250,13 @@ class _DrawingPageState extends State<DrawingPage> {
         );
       },
     );
+  }
+
+  Future<void> onShowMessages(bool value) async {
+    setState(() {
+      showMessages = !showMessages;
+    });
+    Navigator.of(context).pop();
   }
 
   Future<void> onShowGrid(bool value) async {
@@ -418,13 +492,22 @@ class _DrawingPageState extends State<DrawingPage> {
   }
 
   Widget buildStrokeToolbar(bool isPortrait) {
+    // stroke buttons as List so we can rotate
+    final strokeButtons = [];
+    int count = 1;
+    for (double stroke in strokesAvailable) {
+      strokeButtons.add(buildStrokeButton(stroke));
+      if (count++ >= 3) break;
+    }
+    strokeButtons.add(buildChangeStrokesButton());
+
+    // all buttons as List so we can use with Row or Column below
     final children = hidden
         ? []
         : [
-            buildStrokeButton(5.0),
-            buildStrokeButton(10.0),
-            buildStrokeButton(15.0),
+            ...strokeButtons,
           ];
+
     if (isPortrait) {
       return Positioned(
         bottom: 120.0,
@@ -432,7 +515,9 @@ class _DrawingPageState extends State<DrawingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
-          children: [...children],
+          children: [
+            ...children,
+          ],
         ),
       );
     } else {
@@ -461,13 +546,39 @@ class _DrawingPageState extends State<DrawingPage> {
           width: strokeWidth * 2,
           height: strokeWidth * 2,
           decoration: BoxDecoration(
-              color: selectedColor, borderRadius: BorderRadius.circular(50.0)),
+            border: Border.all(color: Colors.black),
+            color: selectedColor,
+            borderRadius: BorderRadius.circular(50.0),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildChangeStrokesButton() {
+    return GestureDetector(
+      onTap: changeStrokes,
+      child: CircleAvatar(
+        backgroundColor: Colors.transparent,
+        child: Text(
+          "...",
+          style: Theme.of(context).textTheme.headline3,
         ),
       ),
     );
   }
 
   Widget buildColorToolbar(bool isPortrait) {
+    // color buttons as List so we can rotate
+    final colorButtons = [];
+    int count = 1;
+    for (Color color in colorsAvailable) {
+      colorButtons.add(buildColorButton(color));
+      if (count++ >= 3) break;
+    }
+    colorButtons.add(buildChangeColorsButton());
+
+    // all buttons as List so we can use with Row or Column below
     final children = hidden
         ? []
         : [
@@ -477,14 +588,9 @@ class _DrawingPageState extends State<DrawingPage> {
               height: 20.0,
               width: 20.0,
             ),
-            buildColorButton(Colors.red),
-            buildColorButton(Colors.blueAccent),
-            buildColorButton(Colors.yellow),
-            buildColorButton(Colors.green),
-            //buildColorButton(Colors.lightBlue),
-            buildColorButton(Colors.black),
-            buildColorButton(Colors.white),
+            ...colorButtons,
           ];
+
     if (isPortrait) {
       return Positioned(
         top: 90.0,
@@ -524,6 +630,19 @@ class _DrawingPageState extends State<DrawingPage> {
             selectedColor = color;
           });
         },
+      ),
+    );
+  }
+
+  Widget buildChangeColorsButton() {
+    return GestureDetector(
+      onTap: changeColors,
+      child: CircleAvatar(
+        backgroundColor: Colors.transparent,
+        child: Text(
+          "...",
+          style: Theme.of(context).textTheme.headline3,
+        ),
       ),
     );
   }
