@@ -441,7 +441,6 @@ class _DrawingPageState extends State<DrawingPage> {
     int colorValue = prefs.getInt('selectedColor') ?? 0xff000000;
     selectedColor = Color(colorValue);
     selectedWidth = prefs.getDouble('selectedWidth') ?? 5.0;
-    hidden = prefs.getBool('hidden') ?? false;
     showMessages = prefs.getBool('showMessages') ?? true;
     showGrid = prefs.getBool('showGrid') ?? false;
     snapToGrid = prefs.getBool('snapToGrid') ?? false;
@@ -455,12 +454,15 @@ class _DrawingPageState extends State<DrawingPage> {
     //     var colorValue =
     //         prefs.getInt('colorsAvailable' + index.toString()) ?? 0;
     //     if (colorValue != 0) {
-    //       print('colorsAvailable' + index.toString());
+    //       print('colorsAvailable' +
+    //           index.toString() +
+    //           ' ' +
+    //           colorValue.toRadixString(16));
     //       colorsAvailable.add(Color(colorValue));
     //     }
     //   }
     // }
-    // print(colorsAvailable.length.toString());
+    print(colorsAvailable.length.toString());
     return true;
   }
 
@@ -470,7 +472,6 @@ class _DrawingPageState extends State<DrawingPage> {
     int temp = selectedColor.value;
     prefs.setInt('selectedColor', temp);
     prefs.setDouble('selectedWidth', selectedWidth);
-    prefs.setBool('hidden', hidden);
     prefs.setBool('showMessages', showMessages);
     prefs.setBool('showGrid', showGrid);
     prefs.setBool('snapToGrid', snapToGrid);
@@ -748,8 +749,13 @@ class _DrawingPageState extends State<DrawingPage> {
     // color buttons as List so we can rotate
     final colorButtons = [];
     int count = 1;
+
     for (Color color in colorsAvailable) {
       colorButtons.add(buildColorButton(color));
+      print('colorButtons' +
+          count.toString() +
+          ' ' +
+          color.value.toRadixString(16));
       if (count++ >= 3) break;
     }
     colorButtons.add(buildChangeColorsButton());
