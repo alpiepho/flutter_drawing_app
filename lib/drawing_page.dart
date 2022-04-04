@@ -333,8 +333,8 @@ class _DrawingPageState extends State<DrawingPage> {
   Future<bool> fromPrefs() async {
     var prefs = await SharedPreferences.getInstance();
 
-    //int colorValue = prefs.getInt('selectedColor') ?? 0xff000000;
-    //selectedColor = Color(colorValue);
+    int colorValue = prefs.getInt('selectedColor') ?? 0xff000000;
+    selectedColor = Color(colorValue);
     selectedWidth = prefs.getDouble('selectedWidth') ?? 5.0;
     hidden = prefs.getBool('hidden') ?? false;
     showMessages = prefs.getBool('showMessages') ?? true;
@@ -348,8 +348,8 @@ class _DrawingPageState extends State<DrawingPage> {
   Future<void> toPrefs() async {
     var prefs = await SharedPreferences.getInstance();
 
-    // int temp = selectedColor as int;
-    // prefs.setInt('temp', temp);
+    int temp = selectedColor.value;
+    prefs.setInt('selectedColor', temp);
     prefs.setDouble('selectedWidth', selectedWidth);
     prefs.setBool('hidden', hidden);
     prefs.setBool('showMessages', showMessages);

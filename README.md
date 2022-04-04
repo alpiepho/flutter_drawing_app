@@ -73,10 +73,10 @@ There is a know issue when redoing points over multiple line segments.  They wil
 - [x] scale toolboxes to fit mobile browser
 - [x] button hover or snackbar message
 - [x] more sizes
+- [x] saved prefrenes for saved state
 
 
 ## TODO
-- [ ] try hive for saved state
 - [ ] color selector
 - [ ] fix redo point from line 1 to line 2, no break
 - [ ] refactor large main file
