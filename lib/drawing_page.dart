@@ -97,6 +97,48 @@ class _DrawingPageState extends State<DrawingPage> {
           }
           break;
         case ClearMode.point:
+          // print("A");
+          // if (lines.length > 0) {
+          //   print("B");
+          //   if (lastLines.length == 0) {
+          //     // add first lastLine
+          //     print("C");
+          //     lastLines.add(lines.last);
+          //     print("D");
+          //     lastLines.last.path.clear();
+          //     // add point
+          //     print("E");
+          //     lastLines.last.path.add(lines.last.path.last);
+          //     // remove point
+          //     print("F");
+          //     lines.last.path.removeLast();
+          //     print("G");
+          //   } else if (lines.last.path.length == 0) {
+          //     // add next line
+          //     print("H");
+          //     lastLines.add(lines.last);
+          //     print("I");
+          //     lastLines.last.path.clear();
+          //     // remove line
+          //     print("J");
+          //     lines.removeLast();
+          //     // add point
+          //     print("K");
+          //     lastLines.last.path.add(lines.last.path.last);
+          //     // remove point
+          //     print("L");
+          //     lines.last.path.removeLast();
+          //   } else {
+          //     // add point
+          //     print("M");
+          //     lastLines.last.path.add(lines.last.path.last);
+          //     // remove point
+          //     print("N");
+          //     lines.last.path.removeLast();
+          //     print("P");
+          //   }
+          //   print("Q");
+          // }
           if (lines.length > 0) {
             if (lines.last.path.length > 0) {
               lastPoints.add(lines.last.path.last);
@@ -126,6 +168,55 @@ class _DrawingPageState extends State<DrawingPage> {
               lastPoints.removeLast();
             }
           }
+          // print("a");
+          // if (lastLines.length > 0) {
+          //   print("b");
+          //   if (lines.length == 0) {
+          //     // add first lastLine
+          //     print("c");
+          //     lines.add(lastLines.last);
+          //     print("d");
+          //     lines.last.path.clear();
+          //     // add point
+          //     print("e");
+          //     lines.last.path.add(lastLines.last.path.last);
+          //     // remove point
+          //     print("f");
+          //     lastLines.last.path.removeLast();
+          //     print("g");
+          //   } else if (lastLines.last.path.length == 0) {
+          //     // add next line
+          //     print("h");
+          //     lines.add(lastLines.last);
+          //     print("i");
+          //     lines.last.path.clear();
+          //     // remove line
+          //     print("j");
+          //     lastLines.removeLast();
+          //     // add point
+          //     print("k");
+          //     if (lastLines.length > 0) {
+          //       print("m");
+          //       lines.last.path.add(lastLines.last.path.last);
+          //       print("n");
+          //       if (lastLines.last.path.length > 0) {
+          //         // remove point
+          //         print("p");
+          //         lastLines.last.path.removeLast();
+          //       }
+          //       print("q");
+          //     }
+          //   } else {
+          //     // add point
+          //     print("r");
+          //     lines.last.path.add(lastLines.last.path.last);
+          //     // remove point
+          //     print("s");
+          //     lastLines.last.path.removeLast();
+          //     print("t");
+          //   }
+          //   print("w");
+          // }
           break;
       }
     });
