@@ -83,14 +83,15 @@ Color Picker should not close until Done.
 - [x] reset colors
 - [x] save colors
 - [x] fix color picker closing immediately
+- [x] fix redo point from line 1 to line 2, no break
 
 ## TODO
 
-- [ ] fix redo point from line 1 to line 2, no break
-- [ ] fix debuging
+- [ ] prevent drawing when swipe up (typicalon mobile)
 - [ ] refactor large main file
 - [ ] add tests
 - [ ] share with author
+- [ ] fix debuging
 
 Question: when is it done?
 

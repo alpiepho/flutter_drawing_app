@@ -28,7 +28,6 @@ class _DrawingPageState extends State<DrawingPage> {
   int gridSize = 10;
   Offset lastPoint; // for straightLines
   List<DrawnLine> lastLines = <DrawnLine>[]; // for redo lines
-  List<Offset> lastPoints = <Offset>[]; // for redo points
   ClearMode clearMode = ClearMode.all; // for toggle of clear button
   List<Color> defaultColorsAvailable = <Color>[
     // for shuffle colors
@@ -76,6 +75,22 @@ class _DrawingPageState extends State<DrawingPage> {
   StreamController<DrawnLine> currentLineStreamController =
       StreamController<DrawnLine>.broadcast();
 
+  void dumpLines(String msg) {
+    print(msg);
+    for (int i = 0; i < lines.length; i++) {
+      print('line[' +
+          i.toString() +
+          '].path.length = ' +
+          lines[i].path.length.toString());
+    }
+    for (int i = 0; i < lastLines.length; i++) {
+      print('lastLines[' +
+          i.toString() +
+          '].path.length = ' +
+          lastLines[i].path.length.toString());
+    }
+  }
+
   Future<void> clear() async {
     setState(() {
       switch (clearMode) {
@@ -97,57 +112,44 @@ class _DrawingPageState extends State<DrawingPage> {
           }
           break;
         case ClearMode.point:
-          // print("A");
-          // if (lines.length > 0) {
-          //   print("B");
-          //   if (lastLines.length == 0) {
-          //     // add first lastLine
-          //     print("C");
-          //     lastLines.add(lines.last);
-          //     print("D");
-          //     lastLines.last.path.clear();
-          //     // add point
-          //     print("E");
-          //     lastLines.last.path.add(lines.last.path.last);
-          //     // remove point
-          //     print("F");
-          //     lines.last.path.removeLast();
-          //     print("G");
-          //   } else if (lines.last.path.length == 0) {
-          //     // add next line
-          //     print("H");
-          //     lastLines.add(lines.last);
-          //     print("I");
-          //     lastLines.last.path.clear();
-          //     // remove line
-          //     print("J");
-          //     lines.removeLast();
-          //     // add point
-          //     print("K");
-          //     lastLines.last.path.add(lines.last.path.last);
-          //     // remove point
-          //     print("L");
-          //     lines.last.path.removeLast();
-          //   } else {
-          //     // add point
-          //     print("M");
-          //     lastLines.last.path.add(lines.last.path.last);
-          //     // remove point
-          //     print("N");
-          //     lines.last.path.removeLast();
-          //     print("P");
-          //   }
-          //   print("Q");
-          // }
+          //dumpLines("AAA:");
+          // any lines left to remove
           if (lines.length > 0) {
+            // any points on last path to remove
             if (lines.last.path.length > 0) {
-              lastPoints.add(lines.last.path.last);
+              // save last point before removing it
+              if (lastLines.length == 0) {
+                // copy last line with empty path
+                List<Offset> newPath = [];
+                DrawnLine newLine = DrawnLine(
+                  newPath,
+                  lines.last.color,
+                  lines.last.width,
+                );
+                lastLines.add(newLine);
+              }
+              lastLines.last.path.add(lines.last.path.last);
+
+              // remove last point
               lines.last.path.removeLast();
             } else {
-              lastLines.add(lines.last);
+              // since points gone, remove last line
               lines.removeLast();
+
+              // save new last line
+              if (lines.length > 0) {
+                // copy last line with empty path
+                List<Offset> newPath = [];
+                DrawnLine newLine = DrawnLine(
+                  newPath,
+                  lines.last.color,
+                  lines.last.width,
+                );
+                lastLines.add(newLine);
+              }
             }
           }
+          //dumpLines("BBB:");
           break;
         case ClearMode.redoAll:
           if (lastLines.length > 0) {
@@ -162,61 +164,44 @@ class _DrawingPageState extends State<DrawingPage> {
           }
           break;
         case ClearMode.redoPoint:
-          if (lastPoints.length > 0) {
-            if (lines.length > 0) {
-              lines.last.path.add(lastPoints.last);
-              lastPoints.removeLast();
+          //dumpLines("aaa:");
+          // any lastLines left to redo
+          if (lastLines.length > 0) {
+            // any points on last path to redo
+            if (lastLines.last.path.length > 0) {
+              // save lastLines point before removing it
+              if (lines.length == 0) {
+                // copy lastLines last line with empty path
+                List<Offset> newPath = [];
+                DrawnLine newLine = DrawnLine(
+                  newPath,
+                  lastLines.last.color,
+                  lastLines.last.width,
+                );
+                lines.add(newLine);
+              }
+              lines.last.path.add(lastLines.last.path.last);
+
+              // remove lastLines last point
+              lastLines.last.path.removeLast();
+            } else {
+              // since points gone, remove lastLines last line
+              lastLines.removeLast();
+
+              // save new last line
+              if (lastLines.length > 0) {
+                // copy lastLines last line with empty path
+                List<Offset> newPath = [];
+                DrawnLine newLine = DrawnLine(
+                  newPath,
+                  lastLines.last.color,
+                  lastLines.last.width,
+                );
+                lines.add(newLine);
+              }
             }
           }
-          // print("a");
-          // if (lastLines.length > 0) {
-          //   print("b");
-          //   if (lines.length == 0) {
-          //     // add first lastLine
-          //     print("c");
-          //     lines.add(lastLines.last);
-          //     print("d");
-          //     lines.last.path.clear();
-          //     // add point
-          //     print("e");
-          //     lines.last.path.add(lastLines.last.path.last);
-          //     // remove point
-          //     print("f");
-          //     lastLines.last.path.removeLast();
-          //     print("g");
-          //   } else if (lastLines.last.path.length == 0) {
-          //     // add next line
-          //     print("h");
-          //     lines.add(lastLines.last);
-          //     print("i");
-          //     lines.last.path.clear();
-          //     // remove line
-          //     print("j");
-          //     lastLines.removeLast();
-          //     // add point
-          //     print("k");
-          //     if (lastLines.length > 0) {
-          //       print("m");
-          //       lines.last.path.add(lastLines.last.path.last);
-          //       print("n");
-          //       if (lastLines.last.path.length > 0) {
-          //         // remove point
-          //         print("p");
-          //         lastLines.last.path.removeLast();
-          //       }
-          //       print("q");
-          //     }
-          //   } else {
-          //     // add point
-          //     print("r");
-          //     lines.last.path.add(lastLines.last.path.last);
-          //     // remove point
-          //     print("s");
-          //     lastLines.last.path.removeLast();
-          //     print("t");
-          //   }
-          //   print("w");
-          // }
+          //dumpLines("bbb:");
           break;
       }
     });
@@ -676,6 +661,8 @@ class _DrawingPageState extends State<DrawingPage> {
     RenderBox box = context.findRenderObject();
     Offset point = gridPoint(box.globalToLocal(details.globalPosition));
     line = DrawnLine([point], selectedColor, selectedWidth);
+    // clear saved lastLines
+    lastLines = [];
   }
 
   void onPanUpdate(DragUpdateDetails details) {
