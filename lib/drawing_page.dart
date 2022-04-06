@@ -59,6 +59,7 @@ class _DrawingPageState extends State<DrawingPage> {
     25.0,
   ];
   bool prefsRead = false;
+  bool swipeFromBottom = false;
 
   // for settings model to be saved in hive? overkill?
   Color selectedColor = Colors.black;
@@ -660,6 +661,18 @@ class _DrawingPageState extends State<DrawingPage> {
     }
     RenderBox box = context.findRenderObject();
     Offset point = gridPoint(box.globalToLocal(details.globalPosition));
+
+    // detect swipeFromBottom that commonly occurs on mobile
+    // then skip drawing
+    var dy = point.dy.round();
+    var maxy = MediaQuery.of(context).size.height - 10;
+    //print(dy.toString());
+    //print(maxy.toString());
+    if (dy > maxy) {
+      swipeFromBottom = true;
+      return;
+    }
+
     line = DrawnLine([point], selectedColor, selectedWidth);
     // clear saved lastLines
     lastLines = [];
@@ -667,6 +680,9 @@ class _DrawingPageState extends State<DrawingPage> {
 
   void onPanUpdate(DragUpdateDetails details) {
     if (hidden) {
+      return;
+    }
+    if (swipeFromBottom) {
       return;
     }
     RenderBox box = context.findRenderObject();
@@ -683,6 +699,10 @@ class _DrawingPageState extends State<DrawingPage> {
 
   void onPanEnd(DragEndDetails details) {
     if (hidden) {
+      return;
+    }
+    if (swipeFromBottom) {
+      swipeFromBottom = false;
       return;
     }
     if (straightLines) {
