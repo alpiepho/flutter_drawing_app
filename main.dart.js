@@ -31640,7 +31640,7 @@ B.b.iK(p.e,0)}},
 XH(a){var s,r=this
 if(r.fx)return
 s=r.yh(r.c.gW().iU(a.b))
-if(J.L1(s.b)>r.c.S(t.w).f.a.b-100){r.db=!0
+if(J.L1(s.b)>r.c.S(t.w).f.a.b-20){r.db=!0
 return}r.f=new A.d1(A.b([s],t.k5),r.dx,r.fr)
 r.y=A.b([],t.cP)},
 XJ(a){var s,r,q,p=this
