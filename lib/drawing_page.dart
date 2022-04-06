@@ -665,7 +665,7 @@ class _DrawingPageState extends State<DrawingPage> {
     // detect swipeFromBottom that commonly occurs on mobile
     // then skip drawing
     var dy = point.dy.round();
-    var maxy = MediaQuery.of(context).size.height - 10;
+    var maxy = MediaQuery.of(context).size.height - 20;
     //print(dy.toString());
     //print(maxy.toString());
     if (dy > maxy) {

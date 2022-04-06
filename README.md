@@ -39,6 +39,7 @@ The set of supported colors is greater than the 3 shown.  Use the '...' to shuff
 
 The set of stroke size can also be shuffled using the '...'.
 
+To avoid extra lines when swiping up to close the app on mobile, there is a 20 pixel guard when drawing from the bottom up.
 
 More features will certainly be added.  Stay tuned.
 
@@ -49,8 +50,6 @@ There is a know issue when redoing points over multiple line segments.  They wil
 The smallest stroke width can be difficult to press.  Has to do with how button is built.
 
 Selected color is not always the top color.
-
-Color Picker should not close until Done.
 
 ## Additions
 
@@ -84,10 +83,10 @@ Color Picker should not close until Done.
 - [x] save colors
 - [x] fix color picker closing immediately
 - [x] fix redo point from line 1 to line 2, no break
+- [x] prevent drawing when swipe up (typicalon mobile)
 
 ## TODO
 
-- [ ] prevent drawing when swipe up (typicalon mobile)
 - [ ] refactor large main file
 - [ ] add tests
 - [ ] share with author
