@@ -87,10 +87,10 @@ Selected color is not always the top color.
 
 ## TODO
 
+- [ ] null safety flutter 2.12.0
 - [ ] refactor large main file
 - [ ] add tests
 - [ ] share with author
-- [ ] fix debuging
 
 Question: when is it done?
 

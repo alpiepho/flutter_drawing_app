@@ -408,7 +408,6 @@ class _DrawingPageState extends State<DrawingPage> {
     setState(() {
       colorsAvailable = defaultColorsAvailable;
       selectedColor = colorsAvailable[0];
-      // TODO rotate Color Toolkit to selected
     });
     toPrefs();
     Navigator.of(context).pop();
