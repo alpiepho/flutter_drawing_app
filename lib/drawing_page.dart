@@ -1,20 +1,16 @@
 import 'dart:async';
 
+import 'package:drawing_app/change_clear_button.dart';
+import 'package:drawing_app/clear_button.dart';
 import 'package:drawing_app/drawn_line.dart';
+import 'package:drawing_app/hide_toolbar.dart';
 import 'package:drawing_app/sketcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-enum ClearMode {
-  all,
-  line,
-  point,
-  redoAll,
-  redoLine,
-  redoPoint,
-}
+import 'change_colors_button.dart';
 
 class DrawingPage extends StatefulWidget {
   @override
@@ -24,9 +20,9 @@ class DrawingPage extends StatefulWidget {
 class _DrawingPageState extends State<DrawingPage> {
   GlobalKey _globalKey = new GlobalKey();
   List<DrawnLine> lines = <DrawnLine>[];
-  DrawnLine line;
+  DrawnLine line = DrawnLine(path: []);
   int gridSize = 10;
-  Offset lastPoint; // for straightLines
+  Offset lastPoint = Offset(-1, -1); // for straightLines
   List<DrawnLine> lastLines = <DrawnLine>[]; // for redo lines
   ClearMode clearMode = ClearMode.all; // for toggle of clear button
   List<Color> defaultColorsAvailable = <Color>[
@@ -76,39 +72,39 @@ class _DrawingPageState extends State<DrawingPage> {
   StreamController<DrawnLine> currentLineStreamController =
       StreamController<DrawnLine>.broadcast();
 
-  void dumpLines(String msg) {
-    print(msg);
-    for (int i = 0; i < lines.length; i++) {
-      print('line[' +
-          i.toString() +
-          '].path.length = ' +
-          lines[i].path.length.toString());
-    }
-    for (int i = 0; i < lastLines.length; i++) {
-      print('lastLines[' +
-          i.toString() +
-          '].path.length = ' +
-          lastLines[i].path.length.toString());
-    }
-  }
+  // void dumpLines(String msg) {
+  //   print(msg);
+  //   for (int i = 0; i < lines.length; i++) {
+  //     print('line[' +
+  //         i.toString() +
+  //         '].path.length = ' +
+  //         lines[i].path.length.toString());
+  //   }
+  //   for (int i = 0; i < lastLines.length; i++) {
+  //     print('lastLines[' +
+  //         i.toString() +
+  //         '].path.length = ' +
+  //         lastLines[i].path.length.toString());
+  //   }
+  // }
 
-  Future<void> clear() async {
+  Future<void> onClear() async {
     setState(() {
       switch (clearMode) {
         case ClearMode.all:
           lastLines = lines;
           lines = [];
-          line = null;
+          line.clear();
           break;
         case ClearMode.line:
           if (lines.length > 0) {
             lastLines.add(lines.last);
             if (lines.length == 1) {
               lines = [];
-              line = null;
+              line.clear();
             } else {
               lines.removeLast();
-              line = null;
+              line.clear();
             }
           }
           break;
@@ -123,9 +119,9 @@ class _DrawingPageState extends State<DrawingPage> {
                 // copy last line with empty path
                 List<Offset> newPath = [];
                 DrawnLine newLine = DrawnLine(
-                  newPath,
-                  lines.last.color,
-                  lines.last.width,
+                  path: newPath,
+                  color: lines.last.color,
+                  width: lines.last.width,
                 );
                 lastLines.add(newLine);
               }
@@ -142,9 +138,9 @@ class _DrawingPageState extends State<DrawingPage> {
                 // copy last line with empty path
                 List<Offset> newPath = [];
                 DrawnLine newLine = DrawnLine(
-                  newPath,
-                  lines.last.color,
-                  lines.last.width,
+                  path: newPath,
+                  color: lines.last.color,
+                  width: lines.last.width,
                 );
                 lastLines.add(newLine);
               }
@@ -175,9 +171,9 @@ class _DrawingPageState extends State<DrawingPage> {
                 // copy lastLines last line with empty path
                 List<Offset> newPath = [];
                 DrawnLine newLine = DrawnLine(
-                  newPath,
-                  lastLines.last.color,
-                  lastLines.last.width,
+                  path: newPath,
+                  color: lastLines.last.color,
+                  width: lastLines.last.width,
                 );
                 lines.add(newLine);
               }
@@ -194,9 +190,9 @@ class _DrawingPageState extends State<DrawingPage> {
                 // copy lastLines last line with empty path
                 List<Offset> newPath = [];
                 DrawnLine newLine = DrawnLine(
-                  newPath,
-                  lastLines.last.color,
-                  lastLines.last.width,
+                  path: newPath,
+                  color: lastLines.last.color,
+                  width: lastLines.last.width,
                 );
                 lines.add(newLine);
               }
@@ -208,7 +204,7 @@ class _DrawingPageState extends State<DrawingPage> {
     });
   }
 
-  Future<void> changeClearMode() async {
+  Future<void> onChangeClearMode() async {
     setState(() {
       switch (clearMode) {
         case ClearMode.all:
@@ -261,7 +257,7 @@ class _DrawingPageState extends State<DrawingPage> {
     }
   }
 
-  Future<void> changeColors() async {
+  Future<void> onChangeColors() async {
     setState(() {
       var last = colorsAvailable.last;
       colorsAvailable.removeLast();
@@ -269,7 +265,7 @@ class _DrawingPageState extends State<DrawingPage> {
     });
   }
 
-  Future<void> changeStrokes() async {
+  Future<void> onChangeStrokes() async {
     setState(() {
       var last = strokesAvailable.last;
       strokesAvailable.removeLast();
@@ -277,7 +273,7 @@ class _DrawingPageState extends State<DrawingPage> {
     });
   }
 
-  Future<void> help() async {
+  Future<void> onHelp() async {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -359,10 +355,10 @@ class _DrawingPageState extends State<DrawingPage> {
                           style: Theme.of(context)
                               .textTheme
                               .headline3
-                              .copyWith(color: Colors.blue),
+                              ?.copyWith(color: Colors.blue),
                         ),
                       ),
-                      onTap: onHelp,
+                      onTap: onHelpLink,
                     ),
                   ]),
             ),
@@ -372,7 +368,7 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  Future<void> onShowMessages(bool value) async {
+  Future<void> onShowMessages(bool? value) async {
     setState(() {
       showMessages = !showMessages;
     });
@@ -380,7 +376,7 @@ class _DrawingPageState extends State<DrawingPage> {
     Navigator.of(context).pop();
   }
 
-  Future<void> onShowGrid(bool value) async {
+  Future<void> onShowGrid(bool? value) async {
     setState(() {
       showGrid = !showGrid;
     });
@@ -388,7 +384,7 @@ class _DrawingPageState extends State<DrawingPage> {
     Navigator.of(context).pop();
   }
 
-  Future<void> onSnapToGrid(bool value) async {
+  Future<void> onSnapToGrid(bool? value) async {
     setState(() {
       snapToGrid = !snapToGrid;
     });
@@ -396,7 +392,7 @@ class _DrawingPageState extends State<DrawingPage> {
     Navigator.of(context).pop();
   }
 
-  Future<void> onStraightLines(bool value) async {
+  Future<void> onStraightLines(bool? value) async {
     setState(() {
       straightLines = !straightLines;
     });
@@ -429,7 +425,7 @@ class _DrawingPageState extends State<DrawingPage> {
     //Navigator.of(context).pop();
   }
 
-  Future<void> onHelp() async {
+  Future<void> onHelpLink() async {
     await launch(
         'https://github.com/alpiepho/flutter_drawing_app/blob/master/README.md');
     Navigator.of(context).pop();
@@ -478,7 +474,7 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  Future<void> hide() async {
+  Future<void> onHide() async {
     setState(() {
       hidden = !hidden;
     });
@@ -505,7 +501,11 @@ class _DrawingPageState extends State<DrawingPage> {
                 buildHelpToolbar(isPortrait),
                 buildStrokeToolbar(isPortrait),
                 buildColorToolbar(isPortrait),
-                buildHideToolbar(isPortrait),
+                HideToolbar(
+                  isPortrait: isPortrait,
+                  hidden: hidden,
+                  hide: onHide,
+                ),
               ],
             ),
           );
@@ -632,7 +632,11 @@ class _DrawingPageState extends State<DrawingPage> {
           Offset(x as double, 0.0),
           Offset(x as double, height as double)
         ];
-        DrawnLine gridLine = DrawnLine(path, Colors.black12, 1.0);
+        DrawnLine gridLine = DrawnLine(
+          path: path,
+          color: Colors.black12,
+          width: 1.0,
+        );
         lines.insert(0, gridLine);
         x += gridSize;
       }
@@ -642,7 +646,11 @@ class _DrawingPageState extends State<DrawingPage> {
           Offset(0.0, y as double),
           Offset(width as double, y as double)
         ];
-        DrawnLine gridLine = DrawnLine(path, Colors.black12, 1.0);
+        DrawnLine gridLine = DrawnLine(
+          path: path,
+          color: Colors.black12,
+          width: 1.0,
+        );
         lines.insert(0, gridLine);
         y += gridSize;
       }
@@ -658,7 +666,7 @@ class _DrawingPageState extends State<DrawingPage> {
     if (hidden) {
       return;
     }
-    RenderBox box = context.findRenderObject();
+    RenderBox box = context.findRenderObject() as RenderBox;
     Offset point = gridPoint(box.globalToLocal(details.globalPosition));
 
     // detect swipeFromBottom that commonly occurs on mobile
@@ -672,7 +680,11 @@ class _DrawingPageState extends State<DrawingPage> {
       return;
     }
 
-    line = DrawnLine([point], selectedColor, selectedWidth);
+    line = DrawnLine(
+      path: [point],
+      color: selectedColor,
+      width: selectedWidth,
+    );
     // clear saved lastLines
     lastLines = [];
   }
@@ -684,14 +696,18 @@ class _DrawingPageState extends State<DrawingPage> {
     if (swipeFromBottom) {
       return;
     }
-    RenderBox box = context.findRenderObject();
+    RenderBox box = context.findRenderObject() as RenderBox;
     Offset point = gridPoint(box.globalToLocal(details.globalPosition));
     if (straightLines) {
       // wont show as drawn, just keep last point
       lastPoint = point;
     } else {
       List<Offset> path = List.from(line.path)..add(point);
-      line = DrawnLine(path, selectedColor, selectedWidth);
+      line = DrawnLine(
+        path: path,
+        color: selectedColor,
+        width: selectedWidth,
+      );
       currentLineStreamController.add(line);
     }
   }
@@ -707,7 +723,11 @@ class _DrawingPageState extends State<DrawingPage> {
     if (straightLines) {
       // finally draw the straight  line
       List<Offset> path = List.from(line.path)..add(lastPoint);
-      line = DrawnLine(path, selectedColor, selectedWidth);
+      line = DrawnLine(
+        path: path,
+        color: selectedColor,
+        width: selectedWidth,
+      );
       currentLineStreamController.add(line);
     }
     lines = List.from(lines)..add(line);
@@ -758,7 +778,7 @@ class _DrawingPageState extends State<DrawingPage> {
 
   Widget buildHelpButton() {
     return GestureDetector(
-      onTap: help,
+      onTap: onHelp,
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
         child: Icon(
@@ -837,7 +857,7 @@ class _DrawingPageState extends State<DrawingPage> {
 
   Widget buildChangeStrokesButton() {
     return GestureDetector(
-      onTap: changeStrokes,
+      onTap: onChangeStrokes,
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
         child: Text(
@@ -857,14 +877,14 @@ class _DrawingPageState extends State<DrawingPage> {
       colorButtons.add(buildColorButton(color));
       if (count++ >= 3) break;
     }
-    colorButtons.add(buildChangeColorsButton());
+    colorButtons.add(ChangeColorsButton(changeColors: onChangeColors));
 
     // all buttons as List so we can use with Row or Column below
     final children = hidden
         ? []
         : [
-            buildClearButton(),
-            buildChangeClearButton(),
+            ClearButton(clearMode: clearMode, clear: onClear),
+            ChangeClearButton(onChange: onChangeClearMode),
             SizedBox(
               height: 20.0,
               width: 20.0,
@@ -912,116 +932,6 @@ class _DrawingPageState extends State<DrawingPage> {
           });
           toPrefs();
         },
-      ),
-    );
-  }
-
-  Widget buildChangeColorsButton() {
-    return GestureDetector(
-      onTap: changeColors,
-      child: CircleAvatar(
-        backgroundColor: Colors.transparent,
-        child: Text(
-          "...",
-          style: Theme.of(context).textTheme.headline3,
-        ),
-      ),
-    );
-  }
-
-  Widget buildClearButton() {
-    var icon;
-    switch (clearMode) {
-      case ClearMode.all:
-        icon = Icons.create;
-        break;
-      case ClearMode.line:
-        icon = Icons.undo;
-        break;
-      case ClearMode.point:
-        icon = Icons.remove;
-        break;
-      case ClearMode.redoAll:
-        icon = Icons.fast_forward;
-        break;
-      case ClearMode.redoLine:
-        icon = Icons.redo;
-        break;
-      case ClearMode.redoPoint:
-        icon = Icons.add;
-        break;
-    }
-    return GestureDetector(
-      onTap: clear,
-      child: CircleAvatar(
-        backgroundColor: Colors.blueGrey,
-        child: Icon(
-          icon,
-          size: 20.0,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Widget buildChangeClearButton() {
-    return GestureDetector(
-      onTap: changeClearMode,
-      child: CircleAvatar(
-        backgroundColor: Colors.transparent,
-        child: Text(
-          "...",
-          style: Theme.of(context).textTheme.headline3,
-        ),
-      ),
-    );
-  }
-
-  Widget buildHideToolbar(bool isPortrait) {
-    if (isPortrait) {
-      return Positioned(
-        top: 20.0,
-        right: 15.0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            buildHideButton(),
-          ],
-        ),
-      );
-    } else {
-      return Positioned(
-        top: 20.0,
-        left: 15.0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            buildHideButton(),
-          ],
-        ),
-      );
-    }
-  }
-
-  Widget buildHideButton() {
-    final child = hidden
-        ? Icon(
-            Icons.keyboard_arrow_down,
-            size: 30.0,
-            color: Colors.black,
-          )
-        : Icon(
-            Icons.keyboard_arrow_up,
-            size: 30.0,
-            color: Colors.black,
-          );
-    return GestureDetector(
-      onTap: hide,
-      child: CircleAvatar(
-        backgroundColor: Colors.transparent,
-        child: child,
       ),
     );
   }
