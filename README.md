@@ -84,17 +84,22 @@ Selected color is not always the top color.
 - [x] fix color picker closing immediately
 - [x] fix redo point from line 1 to line 2, no break
 - [x] prevent drawing when swipe up (typicalon mobile)
+- [x] null safety flutter 2.12.0
 
 ## TODO
 
-- [ ] null safety flutter 2.12.0
-- [ ] refactor large main file
-- [ ] add tests
-- [ ] share with author
+- [ ] refactor large main file?
+- [ ] add tests?
+- [ ] share with author?
 
 Question: when is it done?
 
-
+Note on refactor: experiment in feature/refactor branch was partially successfull
+- more files than expected
+- did not reduce size of drawing_page.dart significantly
+- stuck on button withe callback that needs parameter ie Fucntion(Color)?
+- integration test does not support flutter web
++ can see how it allows better testing
 
 
 - [ ] look into leverage for sketch app
